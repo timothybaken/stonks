@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio Projection · IWDA / EMIM</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --bg2: #171717;
+    --bg3: #1e1e1e;
+    --border: #2a2a2a;
+    --text: #e8e6e0;
+    --text2: #888;
+    --text3: #555;
+    --green: #5cb85c;
+    --red: #e05555;
+    --accent: #c9a84c;
+    --font-mono: 'DM Mono', monospace;
+    --font-display: 'Playfair Display', serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-mono);
+    min-height: 100vh;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1.25rem;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  header h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    color: var(--accent);
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+  }
+
+  header p {
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .tag {
+    font-size: 10px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  /* Controls */
+  .grid-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .control-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.1rem 1.25rem;
+  }
+
+  .control-card label {
+    display: block;
+    font-size: 10px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 10px;
+  }
+
+  .input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    transition: border-color .2s;
+  }
+  .input-wrap:focus-within { border-color: var(--accent); }
+
+  .input-prefix {
+    color: var(--accent);
+    font-size: 1.1rem;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+  .input-suffix {
+    color: var(--text3);
+    font-size: 0.85rem;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .input-wrap input[type=number] {
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 1.3rem;
+    width: 100%;
+    font-weight: 500;
+    min-width: 0;
+    -moz-appearance: textfield;
+  }
+  .input-wrap input[type=number]::-webkit-inner-spin-button,
+  .input-wrap input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+  .input-hint {
+    font-size: 10px;
+    color: var(--text3);
+    margin-top: 7px;
+    letter-spacing: .04em;
+    line-height: 1.5;
+  }
+
+  .freq-toggle {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .freq-btn {
+    flex: 1;
+    padding: 5px 0;
+    font-size: 10px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--bg3);
+    color: var(--text3);
+    cursor: pointer;
+    transition: all .15s;
+    font-family: var(--font-mono);
+  }
+  .freq-btn.active {
+    background: var(--accent);
+    color: #000;
+    border-color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* Metrics */
+  .metrics-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px;
+    margin-bottom: 1.5rem;
+  }
+
+  .metric {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .85rem 1rem;
+  }
+
+  .metric .m-label {
+    font-size: 10px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 4px;
+  }
+
+  .metric .m-value {
+    font-size: 1.2rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  .metric .m-sub {
+    font-size: 10px;
+    color: var(--text3);
+    margin-top: 3px;
+  }
+
+  /* Chart */
+  .chart-wrap {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .chart-inner { position: relative; width: 100%; height: 300px; }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--text2);
+  }
+
+  .legend-line { width: 24px; height: 2px; border-radius: 2px; }
+
+  /* Tables */
+  .tables-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 2rem;
+  }
+
+  .table-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.1rem;
+  }
+
+  .table-card .t-label {
+    font-size: 10px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .table-card table { width: 100%; border-collapse: collapse; }
+  .table-card td { padding: 4px 0; font-size: 12px; }
+  .table-card td:first-child { color: var(--text3); }
+  .table-card td:last-child { text-align: right; font-weight: 500; }
+
+  .base-card { border-color: var(--accent) !important; }
+
+  .badge {
+    display: inline-block;
+    font-size: 9px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 3px;
+    background: var(--accent);
+    color: #000;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+
+  footer {
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: .05em;
+    line-height: 1.7;
+    border-top: 1px solid var(--border);
+    padding-top: 1.25rem;
+  }
+
+  @media (max-width: 500px) {
+    body { padding: 1rem 1rem 3rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Portfolio Projection</h1>
+    <p>IWDA · EMIM · Long-term compound model</p>
+  </div>
+  <span class="tag">Personal · Not financial advice</span>
+</header>
+
+<!-- Controls -->
+<div class="grid-controls">
+
+  <!-- Starting value -->
+  <div class="control-card">
+    <label>Starting Portfolio Value</label>
+    <div class="input-wrap">
+      <span class="input-prefix">€</span>
+      <input type="number" id="startInput" value="0" min="0" step="100">
+    </div>
+    <div class="input-hint">Current portfolio value · as of <span class="as-of-label"></span></div>
+  </div>
+
+  <!-- Years -->
+  <div class="control-card">
+    <label>Projection Horizon</label>
+    <div class="input-wrap">
+      <input type="number" id="yearsInput" value="5" min="1" max="50" step="1">
+      <span class="input-suffix">years</span>
+    </div>
+    <div class="input-hint">How far ahead to project</div>
+  </div>
+
+  <!-- Monthly contribution -->
+  <div class="control-card">
+    <label>Extra Contribution</label>
+    <div class="input-wrap">
+      <span class="input-prefix">€</span>
+      <input type="number" id="contribInput" value="500" min="0" step="50">
+    </div>
+    <div class="freq-toggle">
+      <button class="freq-btn active" data-freq="monthly">Monthly</button>
+      <button class="freq-btn" data-freq="quarterly">Quarterly</button>
+      <button class="freq-btn" data-freq="annually">Annually</button>
+    </div>
+  </div>
+
+  <!-- Bear rate -->
+  <div class="control-card">
+    <label>Bear Rate</label>
+    <div class="input-wrap" style="border-color:#e0555540;">
+      <input type="number" id="bearRate" value="6" min="0" max="100" step="0.5" style="color:var(--red);">
+      <span class="input-suffix">%/yr</span>
+    </div>
+    <div class="input-hint">Pessimistic scenario · default 6%</div>
+  </div>
+
+  <!-- Base rate -->
+  <div class="control-card" style="border-color:var(--accent);">
+    <label>Base Rate</label>
+    <div class="input-wrap" style="border-color:#c9a84c40;">
+      <input type="number" id="baseRate" value="10" min="0" max="100" step="0.5" style="color:var(--accent);">
+      <span class="input-suffix">%/yr</span>
+    </div>
+    <div class="input-hint">Realistic scenario · default 10%</div>
+  </div>
+
+  <!-- Bull rate -->
+  <div class="control-card">
+    <label>Bull Rate</label>
+    <div class="input-wrap" style="border-color:#5cb85c40;">
+      <input type="number" id="bullRate" value="14" min="0" max="100" step="0.5" style="color:var(--green);">
+      <span class="input-suffix">%/yr</span>
+    </div>
+    <div class="input-hint">Optimistic scenario · default 14%</div>
+  </div>
+
+</div>
+
+<!-- Metrics -->
+<div class="metrics-row">
+  <div class="metric">
+    <div class="m-label">Starting value</div>
+    <div class="m-value" id="mStart" style="color:var(--accent)">—</div>
+    <div class="m-sub as-of-label"></div>
+  </div>
+  <div class="metric">
+    <div class="m-label">End year</div>
+    <div class="m-value" id="mEndYear" style="color:var(--text2)">—</div>
+    <div class="m-sub" id="mYears">—</div>
+  </div>
+  <div class="metric">
+    <div class="m-label">Total contributed</div>
+    <div class="m-value" id="mContrib" style="color:var(--text2)">—</div>
+    <div class="m-sub">Your extra deposits</div>
+  </div>
+  <div class="metric">
+    <div class="m-label">Bear end value</div>
+    <div class="m-value" id="mBear" style="color:var(--red)">—</div>
+    <div class="m-sub" id="mBearSub">6%/yr</div>
+  </div>
+  <div class="metric">
+    <div class="m-label">Base end value</div>
+    <div class="m-value" id="mBase" style="color:var(--accent)">—</div>
+    <div class="m-sub" id="mBaseSub">12%/yr</div>
+  </div>
+  <div class="metric">
+    <div class="m-label">Bull end value</div>
+    <div class="m-value" id="mBull" style="color:var(--green)">—</div>
+    <div class="m-sub" id="mBullSub">18%/yr</div>
+  </div>
+</div>
+
+<!-- Chart -->
+<div class="chart-wrap">
+  <div class="chart-inner">
+    <canvas id="chart"></canvas>
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-line" style="background:var(--accent)"></div> <span id="legendBase">Base (12%/yr)</span></div>
+    <div class="legend-item"><div class="legend-line" style="background:var(--green);opacity:.8"></div> <span id="legendBull">Bull (18%/yr)</span></div>
+    <div class="legend-item"><div class="legend-line" style="background:var(--red);opacity:.8"></div> <span id="legendBear">Bear (6%/yr)</span></div>
+    <div class="legend-item"><div class="legend-line" style="background:var(--accent);opacity:.35"></div> Base (no contributions)</div>
+    <div class="legend-item"><div class="legend-line" style="background:#444"></div> Cost basis</div>
+  </div>
+</div>
+
+<!-- Tables -->
+<div class="tables-grid">
+  <div class="table-card">
+    <div class="t-label" id="tLabelBear" style="color:var(--red)">Bear · 6%/yr</div>
+    <div id="bearTable"></div>
+  </div>
+  <div class="table-card base-card">
+    <div class="badge">Base case</div>
+    <div class="t-label" id="tLabelBase" style="color:var(--accent)">Base · 12%/yr</div>
+    <div id="baseTable"></div>
+  </div>
+  <div class="table-card">
+    <div class="t-label" id="tLabelBull" style="color:var(--green)">Bull · 18%/yr</div>
+    <div id="bullTable"></div>
+  </div>
+</div>
+
+<footer>
+  Assumptions — Nominal values only, no inflation adjustment, no tax. Contributions invested at start of each period and compound from that point. Bear = 6%/yr · Base = 10%/yr · Bull = 14%/yr. This model is for personal planning purposes only and does not constitute financial advice.
+</footer>
+
+<script>
+let freq = 'monthly';
+
+// Dynamic date
+const NOW = new Date();
+const CURRENT_YEAR = NOW.getFullYear();
+const endOfYear = new Date(CURRENT_YEAR, 11, 31);
+const startOfYear = new Date(CURRENT_YEAR, 0, 1);
+const PARTIAL_FRAC = (endOfYear - NOW) / (endOfYear - startOfYear);
+const AS_OF_LABEL = NOW.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+
+document.querySelectorAll('.as-of-label').forEach(el => el.textContent = AS_OF_LABEL);
+
+function fmt(v) {
+  if (v >= 1e6) return '€' + (v / 1e6).toFixed(2) + 'M';
+  return '€' + Math.round(v / 1000) + 'k';
+}
+
+function getAnnualContrib(amount, freq) {
+  if (freq === 'monthly') return amount * 12;
+  if (freq === 'quarterly') return amount * 4;
+  return amount;
+}
+
+function buildSeries(startVal, years, rate, contribPerYear) {
+  let val = startVal * Math.pow(1 + rate, PARTIAL_FRAC);
+  val += contribPerYear * PARTIAL_FRAC;
+  const arr = [startVal, val];
+  for (let i = 1; i <= years; i++) {
+    val = (val + contribPerYear) * (1 + rate);
+    arr.push(val);
+  }
+  return arr;
+}
+
+function buildNoContrib(startVal, years, rate) {
+  const partial = startVal * Math.pow(1 + rate, PARTIAL_FRAC);
+  const arr = [startVal, partial];
+  for (let i = 1; i <= years; i++) arr.push(partial * Math.pow(1 + rate, i));
+  return arr;
+}
+
+function makeLabels(years) {
+  const l = [AS_OF_LABEL, 'End ' + CURRENT_YEAR];
+  for (let i = 1; i <= years; i++) l.push('End ' + (CURRENT_YEAR + i));
+  return l;
+}
+
+function makeTable(data, color) {
+  const years = data.length - 2;
+  const step = years > 15 ? 5 : 1;
+  let html = '<table>';
+  html += `<tr><td>End ${CURRENT_YEAR}</td><td style="color:${color}">${fmt(data[1])}</td></tr>`;
+  for (let i = 1; i <= years; i++) {
+    if (i % step === 0 || i === years) {
+      html += `<tr><td>End ${CURRENT_YEAR + i}</td><td style="color:${color}">${fmt(data[i + 1])}</td></tr>`;
+    }
+  }
+  html += '</table>';
+  return html;
+}
+
+const ctx = document.getElementById('chart').getContext('2d');
+const chart = new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: [],
+    datasets: [
+      { label: 'Cost basis',        data: [], borderColor: '#444',    borderWidth: 1,   pointRadius: 0, tension: 0,   fill: false },
+      { label: 'Base (no contrib)', data: [], borderColor: '#c9a84c', borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false, borderDash: [4, 4] },
+      { label: 'Base (12%)',        data: [], borderColor: '#c9a84c', borderWidth: 2.5, pointRadius: 0, tension: 0.3, fill: false },
+      { label: 'Bull (18%)',        data: [], borderColor: '#5cb85c', borderWidth: 2,   pointRadius: 0, tension: 0.3, fill: false, borderDash: [6, 4] },
+      { label: 'Bear (6%)',         data: [], borderColor: '#e05555', borderWidth: 2,   pointRadius: 0, tension: 0.3, fill: false, borderDash: [3, 4] },
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: { duration: 250 },
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#1e1e1e',
+        borderColor: '#2a2a2a',
+        borderWidth: 1,
+        titleColor: '#888',
+        bodyColor: '#e8e6e0',
+        titleFont: { family: "'DM Mono', monospace", size: 11 },
+        bodyFont: { family: "'DM Mono', monospace", size: 12 },
+        callbacks: {
+          label: c => c.raw !== null ? `  ${c.dataset.label}: ${fmt(c.raw)}` : null
+        }
+      }
+    },
+    scales: {
+      x: {
+        ticks: { color: '#555', font: { family: "'DM Mono', monospace", size: 10 }, maxRotation: 45, autoSkip: true, maxTicksLimit: 12 },
+        grid: { color: '#1e1e1e' },
+        border: { color: '#2a2a2a' }
+      },
+      y: {
+        ticks: { color: '#555', font: { family: "'DM Mono', monospace", size: 11 }, callback: v => fmt(v) },
+        grid: { color: '#1e1e1e' },
+        border: { color: '#2a2a2a' }
+      }
+    }
+  }
+});
+
+function update() {
+  const startVal = Math.max(0, parseFloat(document.getElementById('startInput').value) || 0);
+  const years    = Math.min(50, Math.max(1, parseInt(document.getElementById('yearsInput').value) || 1));
+  const contrib  = Math.max(0, parseFloat(document.getElementById('contribInput').value) || 0);
+  const bearR    = Math.max(0, parseFloat(document.getElementById('bearRate').value) || 0) / 100;
+  const baseR    = Math.max(0, parseFloat(document.getElementById('baseRate').value) || 0) / 100;
+  const bullR    = Math.max(0, parseFloat(document.getElementById('bullRate').value) || 0) / 100;
+  const annualContrib = getAnnualContrib(contrib, freq);
+  const totalContrib  = annualContrib * (years + PARTIAL_FRAC);
+
+  const labels = makeLabels(years);
+  const base   = buildSeries(startVal, years, baseR, annualContrib);
+  const bull   = buildSeries(startVal, years, bullR, annualContrib);
+  const bear   = buildSeries(startVal, years, bearR, annualContrib);
+  const baseNC = buildNoContrib(startVal, years, baseR);
+  const cost   = labels.map(() => startVal);
+
+  chart.data.labels = labels;
+  chart.data.datasets[0].data = cost;
+  chart.data.datasets[1].data = baseNC;
+  chart.data.datasets[2].data = base;
+  chart.data.datasets[3].data = bull;
+  chart.data.datasets[4].data = bear;
+  chart.update();
+
+  // Update legend and metric labels with current rates
+  const bearPct = (bearR * 100).toFixed(1).replace(/\.0$/, '') + '%';
+  const basePct = (baseR * 100).toFixed(1).replace(/\.0$/, '') + '%';
+  const bullPct = (bullR * 100).toFixed(1).replace(/\.0$/, '') + '%';
+
+  chart.data.datasets[1].label = `Base (no contrib)`;
+  chart.data.datasets[2].label = `Base (${basePct})`;
+  chart.data.datasets[3].label = `Bull (${bullPct})`;
+  chart.data.datasets[4].label = `Bear (${bearPct})`;
+
+  document.getElementById('legendBase').textContent = `Base (${basePct}/yr)`;
+  document.getElementById('legendBull').textContent = `Bull (${bullPct}/yr)`;
+  document.getElementById('legendBear').textContent = `Bear (${bearPct}/yr)`;
+  document.getElementById('mBearSub').textContent   = bearPct + '/yr';
+  document.getElementById('mBaseSub').textContent   = basePct + '/yr';
+  document.getElementById('mBullSub').textContent   = bullPct + '/yr';
+  document.getElementById('tLabelBear').textContent = `Bear · ${bearPct}/yr`;
+  document.getElementById('tLabelBase').textContent = `Base · ${basePct}/yr`;
+  document.getElementById('tLabelBull').textContent = `Bull · ${bullPct}/yr`;
+
+  document.getElementById('mStart').textContent   = '€' + Math.round(startVal).toLocaleString();
+  document.getElementById('mEndYear').textContent  = CURRENT_YEAR + years;
+  document.getElementById('mYears').textContent    = years + ' year' + (years !== 1 ? 's' : '');
+  document.getElementById('mContrib').textContent  = fmt(totalContrib);
+  document.getElementById('mBear').textContent     = fmt(bear[bear.length - 1]);
+  document.getElementById('mBase').textContent     = fmt(base[base.length - 1]);
+  document.getElementById('mBull').textContent     = fmt(bull[bull.length - 1]);
+
+  document.getElementById('baseTable').innerHTML = makeTable(base, '#c9a84c');
+  document.getElementById('bullTable').innerHTML = makeTable(bull, '#5cb85c');
+  document.getElementById('bearTable').innerHTML = makeTable(bear, '#e05555');
+}
+
+document.getElementById('startInput').addEventListener('input', update);
+document.getElementById('yearsInput').addEventListener('input', update);
+document.getElementById('contribInput').addEventListener('input', update);
+document.getElementById('bearRate').addEventListener('input', update);
+document.getElementById('baseRate').addEventListener('input', update);
+document.getElementById('bullRate').addEventListener('input', update);
+
+document.querySelectorAll('.freq-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.freq-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    freq = btn.dataset.freq;
+    update();
+  });
+});
+
+update();
+</script>
+</body>
+</html>
